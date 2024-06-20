@@ -3,16 +3,15 @@
 
 #include <string>
 using namespace std;
-class Dish
-{
+
+class Dish {
 private:
     int id;
     string name;
     int price;
 
 public:
-    Dish(string name, int price) : name(name), price(price)
-    {
+    Dish(string name, int price) : name(name), price(price) {
         static int ID = 24001;
         id = ID;
         ID++;

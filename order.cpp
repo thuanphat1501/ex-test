@@ -1,3 +1,4 @@
+
 #include"order.hpp"
 
 void Order::setNumberDish(int number)
@@ -5,7 +6,7 @@ void Order::setNumberDish(int number)
     number_dish = number;
 }
 
-Dish Order::getDish() const 
+Dish Order::getDish() const
 {
     return dish;
 }

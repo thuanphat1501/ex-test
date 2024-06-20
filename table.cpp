@@ -1,98 +1,157 @@
-﻿#include "order.hpp"
-#include"table.hpp"
-#include"dish.hpp"
-#include <list>
+﻿#include "table.hpp"
 #include <iostream>
-#include<string>
+
 using namespace std;
 
-int Table::getID() const
-{
+int Table::getID() const {
     return id_table;
 }
 
-bool Table::getStatusTable() const
-{
+bool Table::getStatusTable() const {
     return status_table;
 }
 
 void Table::orderDish() {
-    // Hiển thị danh sách món ăn
-    cout << "Danh sách món ăn:" << endl;
-    for (const auto& dish : *menu) {
-        cout << "ID: " << dish.getID() << ", Tên: " << dish.getName() << ", Giá: " << dish.getPrice() << endl;
+    if (!menu || menu->empty()) {
+        cout << "Menu is empty or not initialized." << endl;
+        return;
     }
 
-    // Nhập ID của món ăn
+    cout << "MENU:" << endl;
+    for (const auto& dish : *menu) {
+        cout << "ID: " << dish.getID() << ", Name: " << dish.getName() << ", Price: " << dish.getPrice() << endl;
+    }
+
     int dishId;
-    cout << "Nhập ID của món ăn: ";
+    cout << "Enter Dish ID: ";
     cin >> dishId;
 
-    // Kiểm tra xem món ăn đã tồn tại trong danh sách menu hay không
     bool found = false;
-    Dish selectedDish; // Khai báo một đối tượng Dish để lưu món ăn đã chọn
+    Dish selectedDish;
     for (const auto& dish : *menu) {
         if (dish.getID() == dishId) {
             found = true;
-            selectedDish = dish; // Lưu thông tin về món ăn đã chọn
+            selectedDish = dish;
             break;
         }
     }
 
     if (found) {
-        // Nhập số lượng món ăn
         int quantity;
-        cout << "Nhập số lượng: ";
+        cout << "Enter quantity: ";
         cin >> quantity;
 
-        // Tạo đối tượng Order và thêm vào danh sách đặt hàng
         Order order(selectedDish, quantity);
         list_order.push_back(order);
 
-        // Cập nhật tổng tiền
-        bill += order.getDish().getPrice() * quantity;
-
-        // In ra thông tin món ăn đã đặt
-        cout << "Đã đặt: " << selectedDish.getName() << " x " << quantity << " - Tổng tiền: " << order.getDish().getPrice() * quantity << endl;
+        cout << "Ordered dish: ID " << selectedDish.getID() << ", Name: " << selectedDish.getName() << ", Quantity: " << quantity << endl;
     }
     else {
-        cout << "Món ăn không tồn tại trong menu." << endl;
+        cout << "The dish does not exist on the menu." << endl;
     }
 }
 
+void Table::deleteDish(int dishId) {
+    if (list_order.empty()) {
+        cout << "No dishes have been ordered yet." << endl;
+        return;
+    }
 
-void Table::deleteDish(Order order) {
-    // Tìm kiếm món ăn trong danh sách đặt hàng
+    // Print the list of ordered dishes before deletion
+    getListOrder();
+
     auto it = list_order.begin();
     while (it != list_order.end()) {
-        if (it->getDish().getID() == order.getDish().getID()) {
-            // Xóa món ăn khỏi danh sách đặt hàng
-            it = list_order.erase(it);
-            break;
+        if (it->getDish().getID() == dishId) {
+            cout << "Dish found: ID: " << it->getDish().getID() << ", Name: " << it->getDish().getName()
+                << ", Quantity: " << it->getNumberDish() << endl;
+
+            int quantityToDelete;
+            cout << "Enter quantity to delete: ";
+            cin >> quantityToDelete;
+
+            if (quantityToDelete >= it->getNumberDish()) {
+                it = list_order.erase(it); // Remove the order if the quantity is equal or greater
+                cout << "Dish removed from order." << endl;
+            }
+            else {
+                it->setNumberDish(it->getNumberDish() - quantityToDelete); // Update the quantity
+                cout << "Updated dish quantity to: " << it->getNumberDish() << endl;
+                ++it;
+            }
+
+            return; // Exit after processing the specified dish
         }
         else {
             ++it;
         }
     }
+
+    cout << "The dish with ID " << dishId << " was not found in the order list." << endl;
+}
+void Table::changeDish(int oldDishId, int newDishId) {
+    if (list_order.empty()) {
+        cout << "No dishes have been ordered yet." << endl;
+        return;
+    }
+
+    auto it = list_order.begin();
+    while (it != list_order.end()) {
+        if (it->getDish().getID() == oldDishId) {
+            cout << "Dish to change found: ID: " << it->getDish().getID() << ", Name: " << it->getDish().getName()
+                << ", Quantity: " << it->getNumberDish() << endl;
+
+            bool newDishFound = false;
+            Dish newDish;
+            for (const auto& dish : *menu) {
+                if (dish.getID() == newDishId) {
+                    newDishFound = true;
+                    newDish = dish;
+                    break;
+                }
+            }
+
+            if (newDishFound) {
+                int quantityToChange = it->getNumberDish();
+                *it = Order(newDish, quantityToChange);
+                cout << "Changed to new dish: ID: " << newDish.getID() << ", Name: " << newDish.getName()
+                    << ", Quantity: " << quantityToChange << endl;
+            }
+            else {
+                cout << "The new dish with ID " << newDishId << " does not exist on the menu." << endl;
+            }
+
+            return; // Exit after processing the specified dish
+        }
+        else {
+            ++it;
+        }
+    }
+
+    cout << "The dish with ID " << oldDishId << " was not found in the order list." << endl;
 }
 
-list<Order> Table::getListOrder()
-{
-     return list_order;
+
+void Table::getListOrder() const {
+    if (list_order.empty()) {
+        cout << "No dishes have been ordered yet." << endl;
+        return;
+    }
+
+    cout << "List of Ordered Dishes:" << endl;
+    for (const auto& order : list_order) {
+        cout << "ID: " << order.getDish().getID() << ", Name: " << order.getDish().getName()
+            << ", Quantity: " << order.getNumberDish() << endl;
+    }
 }
 
-void Table::makePayment()
-{
-    // Tính tổng số tiền cho các món ăn trong list_order
+
+void Table::makePayment() {
     int totalPayment = 0;
-    for (const Order& order : list_order)
-    {
+    for (const Order& order : list_order) {
         totalPayment += order.getDish().getPrice() * order.getNumberDish();
     }
 
-    // Cập nhật giá trị của biến bill
     bill = totalPayment;
-
-    // Xóa danh sách đặt hàng
     list_order.clear();
 }

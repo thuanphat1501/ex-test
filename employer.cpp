@@ -1,11 +1,10 @@
-﻿#include"employer.hpp"
+﻿#include "employer.hpp"
+#include "dish.hpp"
 #include"table.hpp"
 #include"manager.hpp"
-#include"dish.hpp"
 #include <vector>
 #include <string>
 #include<iostream>
-
 void Employer::updateTableList(list<Dish> menu, int number)
 {
     list_table.clear(); // Xóa danh sách bàn hiện tại

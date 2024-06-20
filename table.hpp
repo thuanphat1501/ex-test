@@ -26,10 +26,12 @@ public:
     int getID() const;
     bool getStatusTable() const;
     void orderDish();
-    void deleteDish(Order order);
-    list<Order> getListOrder();
+    void deleteDish(int dishId);
+    void getListOrder() const;
+    void changeDish(int oldDishId, int newDishId);
     void makePayment();
-    const list<Dish>& getMenu() const { return *menu; } // Thêm ph??ng th?c ?? l?y menu
+    void setMenu(const list<Dish>& newMenu) { menu = &newMenu; } // Thêm ph??ng th?c ?? l?y menu
+    const list<Dish>& getMenu() const { return *menu; }
 };
 
 #endif // !TABLE_H
